@@ -2,9 +2,9 @@ const path = require('path');
 
 module.exports = {
   mode: process.env.NODE_ENV || 'development',
-  entry: './src/js/main.js',
+  entry: './src/js/index.js',
   output: {
-    filename: 'main.js',
+    filename: 'index.js',
     path: path.resolve(__dirname, 'dist'),
   },
   devServer: {
