@@ -2,23 +2,10 @@ import i18next from 'i18next';
 import { uniqueId } from 'lodash';
 import * as yup from 'yup';
 import onChange from 'on-change';
-import axios from 'axios';
 import ru from './locales/ru.js';
+import { getAxiosResponse, createPosts, getNewPosts } from './utils.js';
 import render from './render.js';
 import parser from './parser.js';
-
-const getAxiosResponse = (url) => {
-  const allOrigins = 'https://allorigins.hexlet.app/get';
-  const newUrl = new URL(allOrigins);
-  newUrl.searchParams.set('url', url);
-  newUrl.searchParams.set('disableCache', 'true');
-  return axios.get(newUrl);
-};
-
-const createPosts = (state, posts, feedId) => {
-  const id = uniqueId();
-  return posts.map((post) => state.content.posts.push({ ...post, feedId, id }));
-};
 
 export default () => {
   const i18nextInstance = i18next.createInstance();
@@ -58,6 +45,7 @@ export default () => {
       };
 
       const state = onChange(initialState, render(elements, initialState, i18nextInstance));
+      getNewPosts(state);
 
       const validate = (url, urlList) => {
         const schema = yup.string().trim().required().url(i18nextInstance.t('errors.invalidUrl'))
