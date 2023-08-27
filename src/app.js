@@ -7,11 +7,6 @@ import ru from './locales/ru.js';
 import render from './render.js';
 import parser from './parser.js';
 
-const validate = (url, urlList) => {
-  const schema = yup.string().trim().required().url().notOneOf(urlList);
-  return schema.validate(url);
-};
-
 const getAxiosResponse = (url) => {
   const allOrigins = 'https://allorigins.hexlet.app/get';
   const newUrl = new URL(allOrigins);
@@ -20,8 +15,10 @@ const getAxiosResponse = (url) => {
   return axios.get(newUrl);
 };
 
-const createPosts = (state, posts, feedId) =>
-  posts.map((post) => state.content.posts.push({ post, feedId }));
+const createPosts = (state, posts, feedId) => {
+  const id = uniqueId();
+  return posts.map((post) => state.content.posts.push({ ...post, feedId, id }));
+};
 
 export default () => {
   const i18nextInstance = i18next.createInstance();
@@ -49,7 +46,6 @@ export default () => {
           visitedLinksIds: new Set(),
           modalId: '',
         },
-        i: '0',
       };
 
       const elements = {
@@ -62,6 +58,12 @@ export default () => {
       };
 
       const state = onChange(initialState, render(elements, initialState, i18nextInstance));
+
+      const validate = (url, urlList) => {
+        const schema = yup.string().trim().required().url(i18nextInstance.t('errors.invalidUrl'))
+          .notOneOf(urlList, i18nextInstance.t('errors.rssAlreadyExists'));
+        return schema.validate(url);
+      };
 
       elements.form.addEventListener('input', (e) => {
         e.preventDefault();
@@ -88,7 +90,6 @@ export default () => {
             state.content.feeds.push({ ...feed, feedId, link: state.inputValue });
             createPosts(state, posts, feedId);
             state.process.processState = 'finished';
-            console.log(state);
           })
           .catch((error) => {
             state.valid = false;

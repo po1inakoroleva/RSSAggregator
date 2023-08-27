@@ -7,6 +7,7 @@ export default {
     content: {
       feeds: 'Фиды',
       posts: 'Посты',
+      watchPost: 'Просмотр',
     },
   },
 };

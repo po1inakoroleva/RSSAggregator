@@ -43,21 +43,55 @@ const createContainer = (elements, type, i18nextInstance) => {
   div1.append(ul);
 };
 
-const renderFeeds = (elements, state, i18nextInstance) => {
+const renderFeed = (elements, state, i18nextInstance) => {
   if (state.content.feeds.length === 1) {
     createContainer(elements, 'feeds', i18nextInstance);
+    createContainer(elements, 'posts', i18nextInstance);
   }
 
   const lastFeed = state.content.feeds.at(-1);
-  const ul = document.querySelector('[data-ul="feeds"]');
+
+  const container = document.querySelector('[data-ul="feeds"]');
   const li = document.createElement('li');
   li.classList.add('list-group-item', 'border-0', 'border-end-0');
   li.innerHTML = `<h3 class="h6 m-0">${lastFeed.title}</h3>
   <p class="m-0 small text-black-50">${lastFeed.description}</p>`;
-  ul.append(li);
+  container.append(li);
 };
 
-const renderPosts = (elements, state) => {};
+const renderPost = (state, i18nextInstance) => {
+  const lastPost = state.content.posts.at(-1);
+
+  const container = document.querySelector('[data-ul="posts"]');
+  const li = document.createElement('li');
+  li.classList.add(
+    'list-group-item',
+    'd-flex',
+    'justify-content-between',
+    'align-items-start',
+    'border-0',
+    'border-end-0',
+  );
+  container.append(li);
+
+  const a = document.createElement('a');
+  a.href = lastPost.link;
+  a.classList.add('fw-bold');
+  a.dataset.id = lastPost.id;
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  a.textContent = lastPost.title;
+  li.append(a);
+
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
+  button.dataset.id = lastPost.id;
+  button.dataset.bsToggle = 'modal';
+  button.dataset.bstarget = '#modal';
+  button.textContent = i18nextInstance.t('content.watchPost');
+  li.append(button);
+};
 
 const handleProcessState = (elements, processState) => {
   switch (processState) {
@@ -93,11 +127,11 @@ export default (elements, state, i18nextInstance) => (path, value, prevValue) =>
       break;
 
     case 'content.feeds':
-      renderFeeds(elements, state, i18nextInstance);
+      renderFeed(elements, state, i18nextInstance);
       break;
 
     case 'content.posts':
-      renderPosts(elements, state, i18nextInstance);
+      renderPost(state, i18nextInstance);
       break;
 
     default:
