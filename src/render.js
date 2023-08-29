@@ -1,106 +1,115 @@
 /* eslint-disable no-param-reassign, no-console  */
-import _ from 'lodash';
 
-const renderErrors = (elements, error, prevError) => {
-  const fieldHadError = !_.isEmpty(prevError);
-  const fieldHasError = !_.isEmpty(error);
-
-  if (!fieldHadError && !fieldHasError) {
-    return;
-  }
-  if (fieldHadError && !fieldHasError) {
+const renderFeedback = (elements, i18nextInstance) => {
+  if (elements.input.classList.contains('is-invalid')) {
     elements.input.classList.remove('is-invalid');
-    elements.feedback.textContent = '';
+    elements.feedback.classList.remove('text-danger');
+    elements.feedback.classList.add('text-success');
   }
-  if (!fieldHadError && fieldHasError) {
+
+  elements.feedback.textContent = i18nextInstance.t('finished');
+};
+
+const renderErrors = (elements, error) => {
+  if (!elements.input.classList.contains('is-invalid')) {
     elements.input.classList.add('is-invalid');
+    elements.feedback.classList.remove('text-success');
+    elements.feedback.classList.add('text-danger');
     elements.feedback.textContent = error;
-  }
-  if (fieldHadError && fieldHasError) {
+  } else {
     elements.feedback.textContent = error;
   }
 };
 
-const createContainer = (elements, type, i18nextInstance) => {
+const renderFeeds = (state, divCard) => {
+  const ul = document.createElement('ul');
+  ul.classList.add('list-group', 'border-0', 'rounded-0');
+
+  state.content.feeds.forEach((feed) => {
+    const { title, description } = feed;
+    const li = document.createElement('li');
+    li.classList.add('list-group-item', 'border-0', 'border-end-0');
+    li.innerHTML = `<h3 class="h6 m-0">${title}</h3>
+    <p class="m-0 small text-black-50">${description}</p>`;
+    ul.append(li);
+  });
+  divCard.append(ul);
+};
+
+const renderPosts = (state, divCard, i18nextInstance) => {
+  const ul = document.createElement('ul');
+  ul.classList.add('list-group', 'border-0', 'rounded-0');
+
+  state.content.posts.forEach((post) => {
+    const { link, title, id } = post;
+    const li = document.createElement('li');
+    li.classList.add(
+      'list-group-item',
+      'd-flex',
+      'justify-content-between',
+      'align-items-start',
+      'border-0',
+      'border-end-0'
+    );
+
+    const a = document.createElement('a');
+    a.href = link;
+    a.classList.add('fw-bold');
+    a.dataset.id = id;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.textContent = title;
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
+    button.dataset.id = id;
+    button.dataset.bsToggle = 'modal';
+    button.dataset.bstarget = '#modal';
+    button.textContent = i18nextInstance.t('content.watchPost');
+
+    ul.append(li);
+    li.append(a, button);
+  });
+
+  divCard.append(ul);
+};
+
+const createContainer = (elements, state, type, i18nextInstance) => {
   const container = elements[type];
+  container.textContent = '';
 
-  const div1 = document.createElement('div');
-  div1.classList.add('card', 'border-0');
-  container.append(div1);
+  const divCard = document.createElement('div');
+  divCard.classList.add('card', 'border-0');
 
-  const div2 = document.createElement('div');
-  div2.classList.add('card-body');
-  div1.append(div2);
+  const divCardBody = document.createElement('div');
+  divCardBody.classList.add('card-body');
 
   const h2 = document.createElement('h2');
   h2.classList.add('card-title', 'h4');
   h2.textContent = i18nextInstance.t(`content.${type}`);
-  div2.append(h2);
 
-  const ul = document.createElement('ul');
-  ul.classList.add('list-group', 'border-0', 'rounded-0');
-  ul.dataset.ul = `${type}`;
-  div1.append(ul);
-};
+  container.append(divCard);
+  divCard.append(divCardBody);
+  divCardBody.append(h2);
 
-const renderFeed = (elements, state, i18nextInstance) => {
-  if (state.content.feeds.length === 1) {
-    createContainer(elements, 'feeds', i18nextInstance);
-    createContainer(elements, 'posts', i18nextInstance);
+  if (type === 'feeds') {
+    renderFeeds(state, divCard);
   }
-
-  const lastFeed = state.content.feeds.at(-1);
-
-  const container = document.querySelector('[data-ul="feeds"]');
-  const li = document.createElement('li');
-  li.classList.add('list-group-item', 'border-0', 'border-end-0');
-  li.innerHTML = `<h3 class="h6 m-0">${lastFeed.title}</h3>
-  <p class="m-0 small text-black-50">${lastFeed.description}</p>`;
-  container.append(li);
+  if (type === 'posts') {
+    renderPosts(state, divCard, i18nextInstance);
+  }
 };
 
-const renderPost = (state, i18nextInstance) => {
-  const lastPost = state.content.posts.at(-1);
-
-  const container = document.querySelector('[data-ul="posts"]');
-  const li = document.createElement('li');
-  li.classList.add(
-    'list-group-item',
-    'd-flex',
-    'justify-content-between',
-    'align-items-start',
-    'border-0',
-    'border-end-0',
-  );
-  container.append(li);
-
-  const a = document.createElement('a');
-  a.href = lastPost.link;
-  a.classList.add('fw-bold');
-  a.dataset.id = lastPost.id;
-  a.target = '_blank';
-  a.rel = 'noopener noreferrer';
-  a.textContent = lastPost.title;
-  li.append(a);
-
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
-  button.dataset.id = lastPost.id;
-  button.dataset.bsToggle = 'modal';
-  button.dataset.bstarget = '#modal';
-  button.textContent = i18nextInstance.t('content.watchPost');
-  li.append(button);
-};
-
-const handleProcessState = (elements, processState) => {
+const handleProcessState = (elements, processState, i18nextInstance) => {
   switch (processState) {
-    case 'finished':
+    case 'error':
       elements.submitBtn.disabled = false;
       break;
 
-    case 'error':
+    case 'finished':
       elements.submitBtn.disabled = false;
+      renderFeedback(elements, i18nextInstance);
       break;
 
     case 'sending':
@@ -116,22 +125,22 @@ const handleProcessState = (elements, processState) => {
   }
 };
 
-export default (elements, state, i18nextInstance) => (path, value, prevValue) => {
+export default (elements, state, i18nextInstance) => (path, value) => {
   switch (path) {
     case 'process.error':
-      renderErrors(elements, value, prevValue);
+      renderErrors(elements, value);
       break;
 
     case 'process.processState':
-      handleProcessState(elements, state.process.processState);
+      handleProcessState(elements, state.process.processState, i18nextInstance);
       break;
 
     case 'content.feeds':
-      renderFeed(elements, state, i18nextInstance);
+      createContainer(elements, state, 'feeds', i18nextInstance);
       break;
 
     case 'content.posts':
-      renderPost(state, i18nextInstance);
+      createContainer(elements, state, 'posts', i18nextInstance);
       break;
 
     default:

@@ -3,11 +3,13 @@ export default {
     errors: {
       invalidUrl: 'Ссылка должна быть валидным URL',
       rssAlreadyExists: 'RSS уже существует',
+      invalidRss: 'Ресурс не содержит валидный RSS',
     },
     content: {
       feeds: 'Фиды',
       posts: 'Посты',
       watchPost: 'Просмотр',
     },
+    finished: 'RSS успешно загружен',
   },
 };

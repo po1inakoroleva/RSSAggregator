@@ -11,13 +11,15 @@ const getAxiosResponse = (url) => {
 };
 
 const createPosts = (state, posts, feedId) => {
-  const id = uniqueId();
-  return posts.map((post) => state.content.posts.push({ ...post, feedId, id }));
+  posts.map((post) => {
+    const id = uniqueId();
+    return state.content.posts.push({ ...post, feedId, id });
+  });
 };
 
 const getNewPosts = (state) => {
-  const promises = state.content.feeds.map(({ link, feedId }) => getAxiosResponse(link)
-    .then((response) => {
+  const promises = state.content.feeds.map(({ link, feedId }) =>
+    getAxiosResponse(link).then((response) => {
       const { posts } = parser(response.data.contents);
       const addedPosts = state.content.posts.map((post) => post.link);
       const newPosts = posts.filter((post) => !addedPosts.includes(post.link));
@@ -25,7 +27,8 @@ const getNewPosts = (state) => {
         createPosts(state, newPosts, feedId);
       }
       return Promise.resolve();
-    }));
+    })
+  );
 
   Promise.allSettled(promises).finally(() => {
     setTimeout(() => getNewPosts(state), 5000);

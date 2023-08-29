@@ -72,12 +72,13 @@ export default () => {
           })
           .then((responce) => {
             const data = responce.data.contents;
-            const { feed, posts } = parser(data);
+            const { feed, posts } = parser(data, i18nextInstance);
             const feedId = uniqueId();
 
             state.content.feeds.push({ ...feed, feedId, link: state.inputValue });
             createPosts(state, posts, feedId);
             state.process.processState = 'finished';
+            elements.form.reset();
           })
           .catch((error) => {
             state.valid = false;
