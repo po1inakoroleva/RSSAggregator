@@ -42,13 +42,21 @@ export default () => {
         feedback: document.querySelector('.feedback'),
         feeds: document.querySelector('.feeds'),
         posts: document.querySelector('.posts'),
+        modal: document.querySelector('.modal'),
+        modalTitle: document.querySelector('.modal-title'),
+        modalBody: document.querySelector('.modal-body'),
+        modalButton: document.querySelector('.full-article'),
       };
 
       const state = onChange(initialState, render(elements, initialState, i18nextInstance));
       getNewPosts(state);
 
       const validate = (url, urlList) => {
-        const schema = yup.string().trim().required().url(i18nextInstance.t('errors.invalidUrl'))
+        const schema = yup
+          .string()
+          .trim()
+          .required()
+          .url(i18nextInstance.t('errors.invalidUrl'))
           .notOneOf(urlList, i18nextInstance.t('errors.rssAlreadyExists'));
         return schema.validate(url);
       };
@@ -85,6 +93,15 @@ export default () => {
             state.process.error = error.message ?? 'defaultError';
             state.process.processState = 'error';
           });
+      });
+      elements.modal.addEventListener('show.bs.modal', (e) => {
+        const id = e.relatedTarget.getAttribute('data-id');
+        state.uiState.modalId = id;
+        state.uiState.visitedLinksIds.add(id);
+      });
+      elements.posts.addEventListener('click', (e) => {
+        const { id } = e.target.dataset;
+        state.uiState.visitedLinksIds.add(id);
       });
     });
 };

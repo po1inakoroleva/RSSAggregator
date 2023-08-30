@@ -65,7 +65,7 @@ const renderPosts = (state, divCard, i18nextInstance) => {
     button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
     button.dataset.id = id;
     button.dataset.bsToggle = 'modal';
-    button.dataset.bstarget = '#modal';
+    button.dataset.bsTarget = '#modal';
     button.textContent = i18nextInstance.t('content.watchPost');
 
     ul.append(li);
@@ -99,6 +99,28 @@ const createContainer = (elements, state, type, i18nextInstance) => {
   if (type === 'posts') {
     renderPosts(state, divCard, i18nextInstance);
   }
+};
+
+const renderModal = (elements, state) => {
+  const { modalId } = state.uiState;
+  const post = state.content.posts.find(({ id }) => id === modalId);
+  elements.modalTitle.innerHTML = `<h5 class="modal-title">${post.title}</h5>`;
+  elements.modalBody.textContent = post.description;
+  elements.modalButton.setAttribute('href', post.link);
+};
+
+const renderPreview = (elements, state) => {
+  const posts = elements.posts.querySelectorAll('li');
+  posts.forEach((post) => {
+    const aElement = post.querySelector('a');
+    if (
+      state.uiState.visitedLinksIds.has(aElement.dataset.id) &&
+      aElement.classList.contains('fw-bold')
+    ) {
+      aElement.classList.remove('fw-bold');
+      aElement.classList.add('fw-normal', 'link-secondary');
+    }
+  });
 };
 
 const handleProcessState = (elements, processState, i18nextInstance) => {
@@ -141,6 +163,14 @@ export default (elements, state, i18nextInstance) => (path, value) => {
 
     case 'content.posts':
       createContainer(elements, state, 'posts', i18nextInstance);
+      break;
+
+    case 'uiState.modalId':
+      renderModal(elements, state);
+      break;
+
+    case 'uiState.visitedLinksIds':
+      renderPreview(elements, state);
       break;
 
     default:
