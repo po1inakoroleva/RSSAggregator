@@ -1,12 +1,21 @@
 {
   "name": "@hexlet/code",
   "version": "1.0.0",
-  "description": "[![Actions Status](https://github.com/po1inakoroleva/frontend-project-11/workflows/hexlet-check/badge.svg)](https://github.com/po1inakoroleva/frontend-project-11/actions)",
-  "main": "index.js",
+  "description": "An RSS aggregator is an application that collects RSS feeds from dispersed sources and provides a single consolidated view.",
+  "main": "src/index.js",
   "scripts": {
     "start": "webpack serve --mode development",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+    "repository": {
+    "type": "git",
+    "url": "git+https://github.com/po1inakoroleva/frontend-project-11.git"
+  },
+  "keywords": [
+    "RSS-aggregator",
+    "project",
+    "webpack"
+  ],
   "author": "Polina Koroleva",
   "license": "ISC",
   "devDependencies": {
