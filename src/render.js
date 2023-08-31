@@ -10,7 +10,21 @@ const renderFeedback = (elements, i18nextInstance) => {
   elements.feedback.textContent = i18nextInstance.t('finished');
 };
 
-const renderErrors = (elements, error) => {
+const renderErrors = (elements, value, i18nextInstance) => {
+  let error = '';
+
+  if (value === 'isEmpty') {
+    error = i18nextInstance.t('errors.isEmpty');
+  } else if (value === 'invalidUrl') {
+    error = i18nextInstance.t('errors.invalidUrl');
+  } else if (value === 'rssAlreadyExists') {
+    error = i18nextInstance.t('errors.rssAlreadyExists');
+  } else if (value === 'parserError') {
+    error = i18nextInstance.t('errors.invalidRss');
+  } else {
+    error = i18nextInstance.t('errors.networkError');
+  }
+
   if (!elements.input.classList.contains('is-invalid')) {
     elements.input.classList.add('is-invalid');
     elements.feedback.classList.remove('text-success');
@@ -49,7 +63,7 @@ const renderPosts = (state, divCard, i18nextInstance) => {
       'justify-content-between',
       'align-items-start',
       'border-0',
-      'border-end-0'
+      'border-end-0',
     );
 
     const a = document.createElement('a');
@@ -114,8 +128,8 @@ const renderPreview = (elements, state) => {
   posts.forEach((post) => {
     const aElement = post.querySelector('a');
     if (
-      state.uiState.visitedLinksIds.has(aElement.dataset.id) &&
-      aElement.classList.contains('fw-bold')
+      state.uiState.visitedLinksIds.has(aElement.dataset.id)
+      && aElement.classList.contains('fw-bold')
     ) {
       aElement.classList.remove('fw-bold');
       aElement.classList.add('fw-normal', 'link-secondary');
@@ -150,7 +164,7 @@ const handleProcessState = (elements, processState, i18nextInstance) => {
 export default (elements, state, i18nextInstance) => (path, value) => {
   switch (path) {
     case 'process.error':
-      renderErrors(elements, value);
+      renderErrors(elements, value, i18nextInstance);
       break;
 
     case 'process.processState':

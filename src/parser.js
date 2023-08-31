@@ -1,10 +1,10 @@
-export default (data, i18nextInstance) => {
+export default (data) => {
   const parser = new DOMParser();
   const parsedData = parser.parseFromString(data, 'application/xml');
 
   const error = parsedData.querySelector('parsererror');
   if (error) {
-    throw new Error(i18nextInstance.t('errors.invalidRss'));
+    throw new Error('parserError');
   }
 
   const channel = parsedData.querySelector('channel');

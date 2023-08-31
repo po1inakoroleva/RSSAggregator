@@ -7,6 +7,16 @@ import { getAxiosResponse, createPosts, getNewPosts } from './utils.js';
 import render from './render.js';
 import parser from './parser.js';
 
+const validate = (url, urlList) => {
+  const schema = yup
+    .string()
+    .trim()
+    .required('isEmpty')
+    .url('invalidUrl')
+    .notOneOf(urlList, 'rssAlreadyExists');
+  return schema.validate(url);
+};
+
 export default () => {
   const i18nextInstance = i18next.createInstance();
   i18nextInstance
@@ -50,16 +60,6 @@ export default () => {
 
       const state = onChange(initialState, render(elements, initialState, i18nextInstance));
       getNewPosts(state);
-
-      const validate = (url, urlList) => {
-        const schema = yup
-          .string()
-          .trim()
-          .required()
-          .url(i18nextInstance.t('errors.invalidUrl'))
-          .notOneOf(urlList, i18nextInstance.t('errors.rssAlreadyExists'));
-        return schema.validate(url);
-      };
 
       elements.form.addEventListener('input', (e) => {
         e.preventDefault();
