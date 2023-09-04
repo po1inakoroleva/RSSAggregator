@@ -7,13 +7,13 @@ import { getAxiosResponse, createPosts, getNewPosts } from './utils.js';
 import render from './render.js';
 import parser from './parser.js';
 
-const validate = (url, urlList) => {
+const validate = (url, feedsUrl) => {
   const schema = yup
     .string()
     .trim()
     .required('isEmpty')
     .url('invalidUrl')
-    .notOneOf(urlList, 'rssAlreadyExists');
+    .notOneOf(feedsUrl, 'rssAlreadyExists');
   return schema.validate(url);
 };
 
